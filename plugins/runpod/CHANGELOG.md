@@ -6,6 +6,14 @@
 All notable changes to the `runpod` plugin are documented here. This project
 follows [Semantic Versioning](https://semver.org/).
 
+## [1.4.1](https://github.com/runpod/runpod-plugins-official/compare/v1.4.0...v1.4.1) (2026-10-05)
+
+
+### Documentation
+
+* prefer Secure Cloud and size models against the host cache ([#60](https://github.com/runpod/runpod-plugins-official/issues/60)) ([e48a33c](https://github.com/runpod/runpod-plugins-official/commit/e48a33cacd74f06e4a8cd5316444b43bf24842c3))
+* **runpod-mcp:** defer the tool surface to the server itself ([#58](https://github.com/runpod/runpod-plugins-official/issues/58)) ([269e471](https://github.com/runpod/runpod-plugins-official/commit/269e471888af48cfdeb49fd42e0a75b208364c19))
+
 ## [1.4.0](https://github.com/runpod/runpod-plugins-official/compare/v1.3.0...v1.4.0) (2026-09-28)
 
 
