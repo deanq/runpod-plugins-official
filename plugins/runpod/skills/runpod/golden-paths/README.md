@@ -44,6 +44,18 @@ Every path assumes this baseline — set it up once, then follow the path:
 - A path with **multiple approaches** is a folder: `NN-name/` with a `README.md`
   (goal, "which variant?", shared schema/gotchas/cost) plus one file per variant.
 
+Each doc starts with frontmatter that says which tools it drives, whether an agent with only
+the Runpod MCP tools can finish it, and which concepts (`../../runpod-usage/concepts/`) it
+works with:
+
+```yaml
+---
+lanes: [runpodctl, ssh]
+mcp: partial        # full | partial | none
+concepts: [pod, network-volume, pod-ssh-access]
+---
+```
+
 Each doc follows the same template: **Goal · Status · Lane(s) → When to use →
 Prerequisites → Walkthrough (real commands) → Verify it works (the actual test +
 observed output) → Gotchas we hit → Cost & cleanup → Skill gaps folded back.**
@@ -133,4 +145,4 @@ observed output) → Gotchas we hit → Cost & cleanup → Skill gaps folded bac
    don't report success on "pod Running" alone.
 4. **Escalate on manual steps** — if something needs a human (OAuth, a quota
    increase, a license click, a missing credential), stop and tell the user.
-5. **Clean up** — set `--stop-after` / `--terminate-after` on test resources.
+5. **Clean up** — remove test resources when done (`runpodctl pod remove`).

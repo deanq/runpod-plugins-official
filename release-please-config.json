@@ -23,6 +23,7 @@
         { "type": "json", "path": "plugins/runpod/.codex-plugin/plugin.json", "jsonpath": "$.version" },
         { "type": "json", "path": "plugins/runpod/gemini-extension.json", "jsonpath": "$.version" },
         { "type": "json", "path": ".claude-plugin/marketplace.json", "jsonpath": "$.version" },
+        { "type": "json", "path": "packages/knowledge/package.json", "jsonpath": "$.version" },
         "plugins/runpod/skills/runpod/SKILL.md",
         "plugins/runpod/skills/runpod-mcp/SKILL.md",
         "plugins/runpod/skills/runpod-migrate/SKILL.md",
@@ -30,7 +31,14 @@
         "plugins/runpod/skills/flash/SKILL.md",
         "plugins/runpod/skills/companion-clis/SKILL.md",
         "plugins/runpod/skills/runpod-usage/SKILL.md",
-        "plugins/runpod/skills/runpod-templates/SKILL.md"
+        "plugins/runpod/skills/runpod-templates/SKILL.md",
+        "plugins/runpod/skills/cost-audit/SKILL.md",
+        "plugins/runpod/skills/discovery/SKILL.md",
+        "plugins/runpod/skills/endpoint-ops/SKILL.md",
+        "plugins/runpod/skills/lifecycle-crud/SKILL.md",
+        "plugins/runpod/skills/pod-deploy/SKILL.md",
+        "plugins/runpod/skills/pod-doctor/SKILL.md",
+        "plugins/runpod/skills/serverless-deploy/SKILL.md"
       ]
     }
   }

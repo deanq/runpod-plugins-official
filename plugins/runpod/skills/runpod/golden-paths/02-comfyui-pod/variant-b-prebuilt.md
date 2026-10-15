@@ -1,3 +1,9 @@
+---
+lanes: [runpodctl]
+mcp: partial
+concepts: [pod, template, container-image, network-volume, exposed-port, container-disk]
+---
+
 # Golden path 02 — ComfyUI — Variant B: prebuilt official image
 
 **Status:** COVERED — live-verified 2026-07-07 on pod `7ydkt5vs4fst25` (RTX 4090,
@@ -38,7 +44,7 @@ runpodctl pod create --name comfyui-prebuilt \
   --gpu-id "NVIDIA GeForce RTX 4090" --data-center-ids <dc-with-4090-and-volume> \
   --ports "8188/http,8080/http,8888/http,22/tcp" \  # 8188 ComfyUI, 8080 FileBrowser, 8888 JupyterLab, 22 SSH
   --network-volume-id <volume-id> --volume-mount-path /workspace \  # persist install + models
-  --ssh --terminate-after <iso8601 a few hours out>                 # SSH (only for adding a model) + cost guard
+  --ssh                                                             # SSH (only for adding a model)
 ```
 
 There is **no install/run step** — ComfyUI is already launched by the image
@@ -121,5 +127,4 @@ Run-specific notes that stay with this walkthrough:
 ## Cost & cleanup
 
 Shared with Variant A — see [Cost & cleanup in the README](README.md#cost--cleanup-shared).
-In short: `--terminate-after` at creation, then `runpodctl pod remove <pod-id>`
-and delete the network volume when done.
+In short: `runpodctl pod remove <pod-id>`, then delete the network volume when done.

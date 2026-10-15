@@ -1,3 +1,9 @@
+---
+lanes: [runpodctl, aws, rest]
+mcp: partial
+concepts: [network-volume, serverless-endpoint, data-center, gpu-type, worker, template, serverless-handler, file-transfer]
+---
+
 # Golden path 10 — high-availability serverless across regions (multi-volume + data sync)
 
 **Goal:** stop a serverless endpoint from being hostage to **one** data center's GPU
@@ -26,7 +32,7 @@ verification**.
   [getting-started.md](../../runpod-usage/reference/getting-started.md) (auth resolution, SSH,
   companion-CLI credentials).
 - `RUNPOD_API_KEY` resolvable (runpodctl + REST). Verify: `curl -s -o /dev/null -w '%{http_code}'
-  https://rest.runpod.io/v1/pods -H "Authorization: Bearer $RUNPOD_API_KEY"` → `200`.
+  https://api.runpod.io/v2/pods -H "Authorization: Bearer $RUNPOD_API_KEY"` → `200`.
 - `aws` CLI configured with **Runpod S3 API keys** (access key = your Runpod `user_...` id, secret =
   `rps_...`). These are **Console-only** to create (Settings → S3 API Keys) — an agent can't
   self-provision them; escalate if they aren't already in `~/.aws/credentials`/env
@@ -130,7 +136,7 @@ pattern), do the work, then remove the pod (the volume persists):
 runpodctl pod create --name sync-cpu \
   --data-center-ids <dc> \
   --network-volume-id <vol-in-that-dc> --volume-mount-path /workspace \
-  --ssh --terminate-after <iso8601 ~1h out>          # a CPU flavor; no GPU needed
+  --ssh                                              # a CPU flavor; no GPU needed
 # SSH in, populate /workspace (hf download, curl, tar -x, aws s3 cp from your own bucket, …)
 runpodctl pod remove <pod-id>                          # volume keeps the data
 ```
@@ -145,7 +151,7 @@ Volume→volume copy: mount **both** volumes on two pods and use `runpodctl send
 Same as Method 2 but with a small GPU, only when the artifact must be produced on a
 GPU **in that DC** (e.g. build a TensorRT/engine file, quantize weights, prime a
 GPU-specific cache). It's the priciest writer — reach for it last. Use the cheapest
-GPU available in that DC and `--terminate-after`.
+GPU available in that DC, and `pod remove` it when done.
 
 ## Walkthrough — stand up the HA endpoint
 
@@ -308,7 +314,7 @@ runpodctl network-volume delete <vol-cz>     # ha-b (EU-CZ-1)
 runpodctl serverless list && runpodctl network-volume list && runpodctl pod list   # confirm clean
 ```
 ✅ All four `{"deleted": true}` on the live run; lists came back with only pre-existing
-resources. Any sync pods should already be removed with `--terminate-after`. The pushed
+resources. Any sync pods should already be removed with `pod remove`. The pushed
 image `<your-registry>/rp-gp10:v1` (a ~150 MB `python:3.11-slim` + `runpod` SDK handler that
 returns `/runpod-volume` contents plus `RUNPOD_DC_ID`/`RUNPOD_VOLUME_ID`) was **left
 public** so this doc references a real, pullable tag; it costs nothing.

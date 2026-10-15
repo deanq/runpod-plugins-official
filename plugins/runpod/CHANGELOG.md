@@ -6,6 +6,72 @@
 All notable changes to the `runpod` plugin are documented here. This project
 follows [Semantic Versioning](https://semver.org/).
 
+## [1.7.3](https://github.com/runpod/runpod-plugins-official/compare/v1.7.2...v1.7.3) (2026-10-14)
+
+
+### Bug Fixes
+
+* **companion-clis:** drop broad allowed-tools so the directory stops holding releases ([#84](https://github.com/runpod/runpod-plugins-official/issues/84)) ([b678400](https://github.com/runpod/runpod-plugins-official/commit/b67840034599fc7aef748db4f12dfdfaa513ab0c))
+* **skills:** hide contributor skills from skills.sh installs and refresh install docs ([#83](https://github.com/runpod/runpod-plugins-official/issues/83)) ([d340a5e](https://github.com/runpod/runpod-plugins-official/commit/d340a5e0f7a1b96e47f75079e1826db401c0a9f2))
+
+
+### Documentation
+
+* point agents to the Runpod agent setup page ([#79](https://github.com/runpod/runpod-plugins-official/issues/79)) ([64a899e](https://github.com/runpod/runpod-plugins-official/commit/64a899e6aae726b102ff2f8d33e65b77ad7b23d2))
+* **runpodctl:** document pod host key trust on project/exec ([#59](https://github.com/runpod/runpod-plugins-official/issues/59)) ([ec02ff7](https://github.com/runpod/runpod-plugins-official/commit/ec02ff7c4daf298c95ac8fb90ec533647be4e8f0))
+
+## [1.7.2](https://github.com/runpod/runpod-plugins-official/compare/v1.7.1...v1.7.2) (2026-10-13)
+
+
+### Documentation
+
+* drop --stop-after/--terminate-after, warn they never worked ([#61](https://github.com/runpod/runpod-plugins-official/issues/61)) ([208d9c0](https://github.com/runpod/runpod-plugins-official/commit/208d9c0698c4191c31e1a65d083b0f402ff0d964))
+* **runpod-migrate:** keep startSsh and startJupyter when migrating pod creates ([#66](https://github.com/runpod/runpod-plugins-official/issues/66)) ([f50e849](https://github.com/runpod/runpod-plugins-official/commit/f50e849305624ebd82f9932272e7051595c73301))
+
+## [1.7.1](https://github.com/runpod/runpod-plugins-official/compare/v1.7.0...v1.7.1) (2026-10-09)
+
+
+### Bug Fixes
+
+* **runpod-mcp:** point at read-guide now that the server serves the plugin's skills ([#76](https://github.com/runpod/runpod-plugins-official/issues/76)) ([50e3dfb](https://github.com/runpod/runpod-plugins-official/commit/50e3dfb69ace7feeb48e10e4943f99ec58c167a7))
+
+## [1.7.0](https://github.com/runpod/runpod-plugins-official/compare/v1.6.0...v1.7.0) (2026-10-09)
+
+
+### Features
+
+* **skills:** add the MCP journey skills for the Runpod MCP server ([#75](https://github.com/runpod/runpod-plugins-official/issues/75)) ([8b0e6de](https://github.com/runpod/runpod-plugins-official/commit/8b0e6defb23b147a9c1b967dd575f79da31f1ae9))
+
+
+### Documentation
+
+* **runpod:** pin a CUDA floor on GPU creates across every lane ([#57](https://github.com/runpod/runpod-plugins-official/issues/57)) ([0db94d9](https://github.com/runpod/runpod-plugins-official/commit/0db94d92637e56d9de7a38ea0229fcf2cbcc4f6e))
+
+## [1.6.0](https://github.com/runpod/runpod-plugins-official/compare/v1.5.0...v1.6.0) (2026-10-08)
+
+
+### Features
+
+* concept graph linked to skills and golden paths, published as @runpod/plugin-knowledge ([#67](https://github.com/runpod/runpod-plugins-official/issues/67)) ([ee2a2c1](https://github.com/runpod/runpod-plugins-official/commit/ee2a2c1771eb063fe8d6dd4df637aa01d7ac40d6))
+
+## [1.5.0](https://github.com/runpod/runpod-plugins-official/compare/v1.4.0...v1.5.0) (2026-10-06)
+
+
+### Features
+
+* **runpod:** add icon and directory listing URLs to Claude plugin manifest ([#71](https://github.com/runpod/runpod-plugins-official/issues/71)) ([f034cfc](https://github.com/runpod/runpod-plugins-official/commit/f034cfc34178137630add2b9a0cb394a1ddbc30b))
+
+
+### Bug Fixes
+
+* **runpod:** clear plugin directory policy findings ([#72](https://github.com/runpod/runpod-plugins-official/issues/72)) ([7448772](https://github.com/runpod/runpod-plugins-official/commit/74487726615030a9f2133417a2d46a159bfea1b1))
+
+
+### Documentation
+
+* prefer Secure Cloud and size models against the host cache ([#60](https://github.com/runpod/runpod-plugins-official/issues/60)) ([e48a33c](https://github.com/runpod/runpod-plugins-official/commit/e48a33cacd74f06e4a8cd5316444b43bf24842c3))
+* **runpod-mcp:** defer the tool surface to the server itself ([#58](https://github.com/runpod/runpod-plugins-official/issues/58)) ([269e471](https://github.com/runpod/runpod-plugins-official/commit/269e471888af48cfdeb49fd42e0a75b208364c19))
+
 ## [1.4.0](https://github.com/runpod/runpod-plugins-official/compare/v1.3.0...v1.4.0) (2026-09-28)
 
 

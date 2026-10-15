@@ -1,3 +1,7 @@
+---
+concepts: [runpodctl, registry-credential]
+---
+
 # runpodctl — behavior reference
 
 **This file does not list flags.** `runpodctl <resource> <action> --help` does, it is always
@@ -92,10 +96,10 @@ Same flags and semantics as `pod logs` above, plus:
 `--idle-timeout 0`, `--workers-max 0`, `--scaler-value 0`). On **v2.9.0 and earlier those were
 silently dropped** from the request, so resetting a dev endpoint back to scale-to-zero looked
 like it applied and the endpoint kept billing. On an older binary verify with `serverless get
-<id>`, or `PATCH https://rest.runpod.io/v1/endpoints/<id>` with an explicit `{"workersMin":0}`.
+<id>`, or `PATCH https://api.runpod.io/v2/serverless/<id>` with an explicit `{"workers":{"min":0}}`.
 
 `serverless update` has **no `--gpu-id` flag** — change an existing endpoint's GPU pool with
-that same `PATCH` and `{"gpuTypeIds":[...]}`.
+that same `PATCH` and `{"gpu":{"pools":[...]}}`.
 
 **Multi-DC** (`--network-volume-ids <v1>,<v2> --data-center-ids <dc1>,<dc2>`) needs
 **runpodctl ≥ v2.4.0**; data does not sync between volumes automatically — golden path
@@ -146,6 +150,47 @@ readiness loop. If interactive SSH isn't available, execute remotely via
 
 `ssh remove-key` takes `--name` **or** `--fingerprint`; use the fingerprint to disambiguate
 keys that share a name.
+
+### Pod host key trust (v2.15.0+)
+
+Through v2.14.0 these paths ran with host key checking disabled. Check `runpodctl version`
+before relying on anything below.
+
+Affects only the **hidden, deprecated** `project` subcommands and `exec python`, which share
+one Go SSH client. **`ssh info` is unchanged**: it prints an ordinary
+`ssh -i <key> root@<ip> -p <port>` and leaves verification to OpenSSH's defaults against your
+own `~/.ssh/known_hosts`.
+
+Those two paths pin a pod's host key in `~/.runpod/ssh/known_hosts`, keyed by `runpod-<podID>`
+rather than by address, because Runpod recycles pod SSH addresses. The Go client enrolls the
+key on first contact, printing the fingerprint to **stderr**, and refuses a key that does not
+match an existing entry. The `rsync` invocation always runs after that, so it **requires** the
+pin rather than creating one: `StrictHostKeyChecking=yes` with `UpdateHostKeys=no`, so it can
+neither enroll a key itself nor let the server add further keys to the entry.
+
+A mismatch means either the pod's container was recreated and so generated a new host key, or
+the connection is being intercepted. A recreated container is the common case: stopping and
+starting a pod clears its container disk, as do `pod update` and a reset, and Runpod's images
+generate fresh host keys at boot. The pod id stays the same, so the pin does not survive a stop
+and start.
+
+When stdin and stderr are both terminals, the Go client shows the recorded and offered
+fingerprints and asks `[y/N]` before replacing that pod's entry. Without a terminal (an agent,
+a script, CI) it fails with the offered fingerprint and names `runpodctl ssh forget <pod-id>`,
+which removes only that pod's entry so the next connection enrolls the key the pod then offers.
+**Never run `ssh forget` unprompted**: clearing the entry destroys the only signal that separates
+a restart from interception. Surface the fingerprint and ask whether the pod was stopped,
+updated, or reset since the last connection. Once the operator confirms one of those,
+`ssh forget` and a retry is the recovery. If none happened, treat it as possible interception.
+
+For about 30 seconds after `pod start`, the API still reports the previous container's address.
+A connection in that window can be refused, reset, end its handshake with `EOF`, or drop
+mid-`rsync`; the CLI reports these as `could not reach pod <id>: it may still be restarting`.
+That is not a trust failure. Wait and retry.
+
+Trust on first use closes silent key substitution on **later** connections. It does **not**
+prevent interception of the **first** connection to a pod; that needs the host key delivered
+over an authenticated Runpod channel, which is separate and unstarted work.
 
 ## File Transfer
 

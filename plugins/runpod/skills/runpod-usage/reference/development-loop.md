@@ -1,3 +1,7 @@
+---
+concepts: [pod, serverless-endpoint, container-image, job]
+---
+
 # The Runpod development loop (golden loop)
 
 Every Runpod task an agent runs follows the same spine — proven across the golden
@@ -33,8 +37,10 @@ This is the biggest lever for speed and reliability:
 
 ## 3. Plan resources
 
-GPU/VRAM (`gpu-selection.md`), storage (**default a network volume** —
-`storage.md`), and the execution lane (`../../runpod/SKILL.md` router:
+GPU/VRAM and the **CUDA floor** (`gpu-selection.md` — default
+`--min-cuda-version 12.8` on any GPU create; a create with no floor accepts any host
+CUDA version and a modern image can land on one too old to run it), storage
+(**default a network volume** — `storage.md`), and the execution lane (`../../runpod/SKILL.md` router:
 runpod-mcp / runpodctl / flash).
 
 ## 4. Provision & 5. Set up
@@ -72,7 +78,8 @@ blocked**. Don't spin or fake progress.
 
 ## 9. Cost-guard + teardown
 
-- Pod → `--terminate-after <ts>` at creation (deletes it), not `--stop-after`.
+- Pod → `runpodctl pod remove <pod-id>` when done. Not `--terminate-after` /
+  `--stop-after`: they were never enforced and v2.12.0 removed them.
 - Serverless → `--workers-min 0` (scale-to-zero, ~$0 idle).
 - Delete test resources when done (`runpodctl pod remove` / `serverless delete` /
   `flash app delete`; then any network volume).

@@ -1,3 +1,7 @@
+---
+concepts: [pod, pod-ssh-access, pod-command-exec, exposed-port, network-volume]
+---
+
 # The pod development loop
 
 A repeatable loop for standing up, iterating on, and delivering **any** workload
@@ -14,6 +18,9 @@ Resolve the choices before creating anything (see `concepts.md`, `gpu-selection.
 - **Pod or serverless?** Long-lived / interactive / a persistent server → pod.
   Request/response that scales to zero → serverless (different lane).
 - **GPU / VRAM** for the workload.
+- **CUDA floor** — set `--min-cuda-version 12.8` on the create unless the image needs
+  otherwise, so a modern image can't land on a host too old to run it
+  ([`gpu-selection.md`](gpu-selection.md#step-3-pin-the-cuda-floor)).
 - **Storage** — default to a **network volume** for anything worth keeping
   (models, datasets, checkpoints, envs). See `storage.md`.
 - **Which ports** the service listens on. These must be declared **at creation**.
@@ -43,12 +50,19 @@ runpodctl pod create \
   --name <name> --template-id <official-template> --gpu-id "<gpu>" \
   --ports "<port>/http,22/tcp" \          # every port the service exposes (+22 for ssh)
   --env '{"KEY":"VALUE"}' \               # goes to PID 1 — NOT the ssh shell (see step 5)
-  --network-volume-id <id> --volume-mount-path /workspace \
-  --terminate-after <iso8601>             # cost guard: TERMINATES the pod
+  --network-volume-id <id> --volume-mount-path /workspace
 ```
 
-`--terminate-after` deletes the pod at that time; `--stop-after` only *stops* it
-(you keep paying for disk/volume), so use `--terminate-after` as the real guard.
+Cost guard: remove the pod when the work is done (`runpodctl pod remove <pod-id>`).
+For an unattended deadline, schedule a stop from inside the pod, which ships
+`runpodctl` and a pod-scoped API key ([Manage Pods](https://docs.runpod.io/pods/manage-pods)). A stopped
+pod still bills for disk and any volume.
+
+> **`--stop-after` / `--terminate-after` never worked.** runpodctl before v2.12.0
+> accepts both flags, but the backend never enforced them, so the pod keeps running
+> and billing past the deadline. v2.12.0 removed them. If `runpodctl pod create
+> --help` still lists them, run `runpodctl update`.
+
 Find a data center that has both your GPU and (for co-location) your volume with
 `runpodctl datacenter list` — its output includes per-DC GPU availability.
 
@@ -136,7 +150,7 @@ progress.
   sample request.
 - Note any security caveat (proxy URLs are public; most dev servers have no auth).
 - Tell the user how to stop/terminate; data on the network volume persists. The
-  `--stop-after`/`--terminate-after` guard from step 2 is the backstop.
+  pod bills until someone stops or removes it.
 
 ## The loop in one line
 

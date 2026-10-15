@@ -10,7 +10,8 @@ description: >-
   provisioning task even when it is not.
 metadata:
   author: runpod
-  version: "1.4.0" # x-release-please-version
+  version: "1.7.3" # x-release-please-version
+  concepts: [runpod-platform, pod, serverless-endpoint, template, network-volume]
 license: Apache-2.0
 ---
 
@@ -25,7 +26,7 @@ the lane; otherwise read the matching skill's `SKILL.md` next.
 
 | Lane | Use it for |
 | --- | --- |
-| **runpod-mcp** | Manage infra (pods, endpoints, jobs, templates, volumes, registries, catalog, billing) via **structured tool calls** — when the Runpod MCP tools are connected in this session. |
+| **runpod-mcp** | Manage infra (pods, endpoints, jobs, templates, volumes, registries, catalog, billing) via **structured tool calls** — when the Runpod MCP tools are connected in this session. Routes on to the journey skill for the task (discovery, lifecycle-crud, serverless-deploy, pod-deploy, pod-doctor, endpoint-ops, cost-audit). |
 | **runpodctl** | Manage the same infra from a **terminal/CI/script**, plus the things only the CLI does: Hub browse/deploy, `send`/`receive` file transfer, SSH keys, `doctor` setup, model cache. |
 | **flash** | **Write Python** that runs on Runpod serverless — `@remote`/`@Endpoint` functions, `flash dev` hot-reload, `flash deploy`. Code-first, not infra management. |
 | **companion-clis** | **Prerequisite artifacts**: download a model (`hf`), build/push an image (`docker`), repos/releases (`gh`), move data to a network volume over S3 (`aws`). |
@@ -54,7 +55,19 @@ reverify — it has already gone stale twice (runpodctl v2.9.0 added `serverless
 added `pod logs`/`serverless logs`). If a limit still holds, name the version it holds for
 rather than saying "cannot".
 
-## First run — check auth before the first infra action
+## First run — update the tools, then check auth
+
+**Update before the first command of every task.** Old builds keep flags that later releases
+fixed or removed. runpodctl before v2.12.0 accepts `pod create --stop-after` /
+`--terminate-after`, but the backend never enforced them, so pods kept billing past the
+deadline. Update each tool you are about to use:
+```bash
+runpodctl update && runpodctl version   # runpodctl
+flash update                            # flash
+```
+The MCP needs no step: the hosted server is always current, and a local install started with
+`npx @runpod/mcp-server@latest` fetches the latest release.
+Use the same build for the rest of the task.
 
 Infra tasks (pods, endpoints, jobs, volumes) need a working control plane — the **Runpod MCP**
 or **runpodctl**. Don't start and discover mid-task that nothing's set up: check first, and if
@@ -155,7 +168,7 @@ moment an op needs a flag/feature MCP doesn't expose.**
 
 For any "get <X> running on Runpod" task, follow the **development loop** in
 `runpod-usage/reference/development-loop.md`: decide pod vs serverless → provision → set up
-(only if from-scratch) → verify → deliver → cost-guard + teardown. Two rules bind within it:
+(only if from-scratch) → verify → deliver → cost-guard + teardown. These rules bind within it:
 
 - **Prefer a prebuilt template / Hub worker over building an image from scratch** —
   official pod templates are indexed in [`runpod-templates`](../runpod-templates/SKILL.md).
@@ -171,6 +184,11 @@ For any "get <X> running on Runpod" task, follow the **development loop** in
   network volume; otherwise the cache is the cheaper default. Cache capacity is per
   machine, so time both on the user's own endpoint rather than quoting a threshold. See
   [`runpodctl/reference/model-caching.md`](../runpodctl/reference/model-caching.md).
+- **Pin the CUDA floor on every GPU create** — `--min-cuda-version 12.8` in runpodctl,
+  `gpu.minCudaVersion: "12.8"` in REST v2 and MCP (`13.0` only for a CUDA-13 image). Without it the create accepts any host CUDA version
+  and a modern image can land on a host too old to run it, which reads as a container that
+  dies at startup or silently runs on CPU:
+  [`gpu-selection.md`](../runpod-usage/reference/gpu-selection.md#step-3-pin-the-cuda-floor).
 
 It branches to two sub-loops:
 
