@@ -30,7 +30,7 @@ Output shapes, error codes and env vars are in
 
 | | detail |
 | --- | --- |
-| mode | `--wait-for ssh` (default) waits as described here; `--wait-for running` (v2.15.0+) waits only until the pod reports its container is up (desiredStatus RUNNING + runtime reported), needs no ssh or public port, and is the correct mode for cpu pods and images without sshd. Setting `--wait-for` implies `--wait` |
+| mode | `--wait-for ssh` (default) waits as described here; `--wait-for running` (v2.15.0+) waits only until the pod reports its container is up (desiredStatus RUNNING + runtime reported), needs no ssh or public port, and is the correct mode when container-up is enough or the image runs no sshd (typical for cpu pods). It proves nothing about ssh, so keep ssh mode when the task needs ssh — including a cpu image that starts its own sshd. Setting `--wait-for` implies `--wait` |
 | ready means | **in ssh mode:** the pod's **public port 22** accepts a tcp connection *and* answers with an ssh protocol banner. No key, no handshake — it proves sshd is up, not that your key is installed. Port 22 merely appearing in `runtime.ports` is not enough: prod allocates that port even for images that run no sshd. **In running mode:** the container is reported up, nothing about ssh |
 | timeout | `--wait-timeout` accepts `90s`, `10m`, `1h`, `2d`; default `10m` |
 | output | progress on **stderr** every ~15s; stdout stays exactly one json object, in the `pod get` shape (so it includes the live `ssh` block, unlike a plain create) |
